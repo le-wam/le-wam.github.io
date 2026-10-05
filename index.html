@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Minghao Fu, Tavis Siebert, Eryk Halicki, Randall Balestriero">
+  <meta name="description" content="LeWAM: End-to-End World and Action Modeling with JEPAs. Joint prediction of latent states and actions supports direct control and visual planning.">
+  <title>LeWAM: End-to-End World and Action Modeling with JEPAs</title>
+
+  <style>
+    @font-face { font-family: "CMU Serif"; font-style: normal; font-weight: 500; font-display: swap; src: url("static/fonts/cmu-serif-500-roman.woff2") format("woff2"); }
+    @font-face { font-family: "CMU Serif"; font-style: italic; font-weight: 500; font-display: swap; src: url("static/fonts/cmu-serif-500-italic.woff2") format("woff2"); }
+    @font-face { font-family: "CMU Serif"; font-style: normal; font-weight: 700; font-display: swap; src: url("static/fonts/cmu-serif-700-roman.woff2") format("woff2"); }
+    @font-face { font-family: "CMU Serif"; font-style: italic; font-weight: 700; font-display: swap; src: url("static/fonts/cmu-serif-700-italic.woff2") format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("static/fonts/ibm-plex-mono-400.ttf") format("truetype"); }
+
+    :root {
+      --ink: #363636;
+      --body: #4a4a4a;
+      --muted: #8c8e90;
+      --link: #226999;
+      --surface: #f8f8f8;
+      --rule: #dddddd;
+      --paper-blue: #163f63;
+      --paper-green: #276947;
+      --paper-orange: #a85e00;
+      --max-width: 760px;
+      --reading-width: 680px;
+      --teaser-width: 672px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--body);
+      background: #fff;
+      font-family: "CMU Serif", "Computer Modern Serif", Georgia, serif;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    a { color: var(--link); }
+    img, video { max-width: 100%; }
+    button, input, select { font: inherit; }
+    .container { width: min(var(--max-width), calc(100% - 48px)); margin: 0 auto; }
+    .section { padding: 3rem 0; }
+    .content p { margin: 0 0 1rem; line-height: 1.7; text-align: left; }
+    .content strong { color: var(--ink); }
+
+    .publication-header { padding: 3rem 0 .5rem; text-align: center; }
+    .publication-title {
+      margin: 0;
+      color: var(--ink);
+      font-family: "CMU Serif", "Computer Modern Serif", Georgia, serif;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: 0;
+      font-size: clamp(1.6rem, 5vw, 2.75rem);
+      margin-bottom: 1.5rem;
+    }
+    .publication-title .title-line { display: block; white-space: nowrap; }
+    .publication-title .title-line + .title-line { font-size: .909em; }
+    .publication-authors { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .2em .65em; font-size: 1.25rem; font-weight: 400; }
+    .author-block { display: inline-block; }
+    .publication-authors a { font-weight: 400; text-decoration: none; }
+    .publication-authors a:hover { text-decoration: underline; }
+    .publication-affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem .7rem; margin: .65rem 0 0; font-size: .9rem; }
+    .publication-contribution { margin: .4rem 0 0; color: var(--muted); font-size: .82rem; }
+    .publication-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: 1.1rem; }
+    .paper-button {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      padding: .55em 1.2em;
+      border: 0;
+      border-radius: 8px;
+      color: var(--muted);
+      background: var(--surface);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .88rem;
+      font-weight: 400;
+      letter-spacing: .03em;
+      line-height: 1.5;
+      text-decoration: none;
+      transition: background-color .15s ease;
+    }
+    .paper-button:hover { color: var(--muted); background: #eeeeee; }
+    .paper-button svg { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .paper-button[aria-disabled="true"] { opacity: .62; cursor: default; }
+    .paper-button:focus-visible, video:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+
+    .teaser { padding: 1.25rem 0 2.5rem; }
+    .media-frame {
+      width: min(100%, var(--teaser-width));
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid #c4c6c8;
+      border-radius: 7px;
+      background: #fff;
+    }
+    .media-frame img { display: block; width: 100%; height: auto; }
+
+    h2.section-title {
+      margin: 0 0 1.5rem;
+      color: var(--ink);
+      font-family: "CMU Serif", "Computer Modern Serif", Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+    }
+    h3.subsection-title {
+      margin: 2rem 0 1.5rem;
+      color: var(--ink);
+      font-family: "CMU Serif", "Computer Modern Serif", Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .abstract-section { padding: 0 0 3rem; }
+    .abstract-section .container, .methodology-section .container { max-width: var(--reading-width); }
+    .abstract-card { width: 100%; margin: 0 auto; padding: 32px 40px; border-radius: 8px; background: #f8f8f8; }
+    .abstract-copy { margin: 0; color: var(--body); font-size: 1rem; line-height: 1.7; text-align: justify; }
+    .methodology-section .figure--method { margin: 1.5rem auto 2rem; }
+    .architecture-details { margin: 2rem auto 0; padding: 1rem 1.2rem; border-radius: 8px; background: var(--surface); color: #5f676e; font-size: .9rem; line-height: 1.6; }
+    .architecture-details h3 { margin: 0 0 .65rem; color: var(--paper-blue); font-family: Arial, Helvetica, sans-serif; font-size: .92rem; }
+    .architecture-details p { margin: .6rem 0; }
+    .architecture-details .formula { margin: .8rem 0; background: #fff; }
+    .architecture-details .model-interface { line-height: 1.8; }
+    .section-lede { width: min(700px, 100%); margin: 0 auto 1.5rem; color: #667078; font-size: 1rem; line-height: 1.5; text-align: center; }
+    .section-copy { width: 100%; margin: 1.25rem auto 1.8rem; color: var(--body); font-size: 1rem; line-height: 1.65; }
+    .section-copy p { margin: .75rem 0; }
+    .section-copy .formula { margin: 1rem 0; }
+
+    .formula {
+      margin: 1.5rem 0;
+      padding: 1.3rem 1.5rem;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 1.08rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .figure { margin: 1.6rem auto 2rem; }
+    .figure > img { display: block; width: 100%; height: auto; }
+    .figure-caption {
+      width: 100%;
+      margin: .75rem auto 0;
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.55;
+      text-align: left;
+    }
+    .figure-caption strong { color: var(--ink); }
+    .paper-reveal { position: relative; }
+    .paper-reveal > img { display: block; width: 100%; height: auto; }
+    .paper-reveal-video { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+    .paper-reveal.is-ready .paper-reveal-video { display: block; }
+    .paper-reveal.is-complete .paper-reveal-video { display: none; }
+    /* Keep the attention diagram and caption inside the shared page column. */
+    .figure--attention { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); align-items: center; gap: clamp(1.2rem, 3vw, 2rem); width: 100%; }
+    .figure--attention > img { grid-column: 2; grid-row: 1; max-width: 19rem; margin: 0 auto; }
+    .figure--attention .figure-caption { grid-column: 1; grid-row: 1; width: auto; margin: 0; padding-left: 1.1rem; border-left: 2px solid var(--paper-blue); font-size: 1rem; }
+    .figure--attention .figure-caption strong { display: block; margin-bottom: .3rem; font-size: 1.17rem; }
+
+    .wf8-figure { width: 100%; margin: 1.3rem auto 2.5rem; }
+    .wf8-paper-scroll { overflow-x: auto; }
+    .wf8-paper { position: relative; width: 100%; min-width: 760px; aspect-ratio: 2577 / 1019; }
+    .wf8-paper-base { display: block; width: 100%; height: 100%; }
+    .wf8-grid { position: absolute; inset: 0; }
+    .wf8-video {
+      position: absolute;
+      display: block;
+      width: 13.333333%;
+      height: 33.263158%;
+      object-fit: cover;
+      border-radius: 2px;
+      background: #fff;
+    }
+
+    .rollout-stage { display: grid; grid-template-columns: minmax(0, 1fr) 46px; align-items: center; gap: .55rem; margin: 1.5rem auto .75rem; }
+    .rollout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.3rem 1.1rem; }
+    .rollout-card, .robot-probe-card { min-width: 0; margin: 0; }
+    .rollout-card figcaption, .robot-probe-card figcaption { margin-top: .45rem; color: var(--ink); font-size: 1.05rem; font-weight: 700; text-align: center; }
+    .rollout-film { width: min(100%, 840px); margin: 0 auto; overflow: hidden; border: 1px solid #d9dde1; border-radius: 7px; background: #171a1d; }
+    .rollout-film-labels { display: grid; grid-template-columns: repeat(3, 1fr); color: #fff; background: #171a1d; font: 700 .8rem Arial, Helvetica, sans-serif; text-align: center; }
+    .rollout-film-labels span { padding: .38rem .15rem; }
+    .rollout-film-labels span + span { border-left: 1px solid #53575a; }
+    .rollout-film video { display: block; width: 100%; height: auto; aspect-ratio: 3; background: #171a1d; }
+    .rollout-wheel { --prediction-color: #3c729f; --reconstruction-color: #b87950; --wheel-color: var(--prediction-color); position: relative; width: 44px; height: 212px; justify-self: center; cursor: grab; touch-action: none; user-select: none; }
+    .rollout-wheel[data-mode="encdec"] { --wheel-color: var(--reconstruction-color); }
+    .rollout-wheel:active { cursor: grabbing; }
+    .rollout-wheel:focus-visible { outline: 2px solid var(--wheel-color); outline-offset: 2px; border-radius: 3px; }
+    .rollout-wheel::before { position: absolute; top: 11px; bottom: 11px; left: calc(50% - .5px); width: 1px; background: #cfd5d9; content: ''; }
+    .rollout-wheel-stop { position: absolute; top: 50%; left: 50%; width: 4px; height: 28px; border-radius: 3px; background: currentColor; opacity: 0; pointer-events: none; transition: transform .22s ease-out; }
+    .rollout-wheel-stop.is-active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px currentColor; }
+    .rollout-wheel-stop[data-mode="preddec"] { color: var(--prediction-color); }
+    .rollout-wheel-stop[data-mode="encdec"] { color: var(--reconstruction-color); }
+    .rollout-wheel-front { position: absolute; top: calc(50% - .5px); left: calc(50% - 8px); width: 16px; height: 1px; background: var(--wheel-color); pointer-events: none; }
+    .rollout-wheel.is-dragging .rollout-wheel-stop { transition: none; }
+    .rollout-caption { margin-top: .9rem; color: #666; }
+
+    .results-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 1rem; }
+    .results-grid .figure { margin: 0; }
+    .paper-table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+    .paper-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+    .paper-table th, .paper-table td { padding: .55rem .7rem; border-bottom: 1px solid #e7e7e7; text-align: left; }
+    .paper-table th { color: var(--ink); font-weight: 700; }
+    .paper-table caption { padding-bottom: .6rem; text-align: left; color: var(--ink); }
+    .paper-table td:not(:first-child) { white-space: nowrap; }
+
+    .robot-demonstrations video { display: block; width: 100%; height: auto; aspect-ratio: 6; background: #fff; }
+    .robot-probe-panel { margin: 1.5rem 0 .75rem; }
+    .robot-probe-stage { display: grid; grid-template-columns: minmax(0, 1fr) 46px; align-items: center; gap: .55rem; }
+    .robot-sample-wheel { color: var(--prediction-color); }
+    .robot-probe-controls { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; margin-bottom: 1rem; }
+    .media-tabs { display: flex; flex-wrap: wrap; gap: .3rem; }
+    .media-tabs button { padding: .35rem .6rem; border: 1px solid transparent; border-radius: 5px; color: #666; background: transparent; font-size: .9rem; cursor: pointer; }
+    .media-tabs button[aria-selected="true"], .media-tabs button[aria-pressed="true"] { border-color: #b9c9d5; color: var(--paper-blue); background: #eaf0f5; }
+    .media-tabs button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+    .robot-probe-models, .robot-probe-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.3rem 1.1rem; }
+    .robot-probe-models { margin-bottom: .6rem; }
+    .robot-probe-models h4 { margin: 0; color: var(--ink); font-size: clamp(.8rem, 2.2vw, 1rem); font-weight: 700; text-align: center; }
+    .robot-probe-grid .rollout-film-labels { grid-template-columns: repeat(3, minmax(0, 1fr)); font-size: clamp(.45rem, 1.6vw, .8rem); }
+
+    #BibTeX pre {
+      margin: 0;
+      padding: 1.5rem 2rem;
+      overflow-x: auto;
+      border: 0;
+      border-radius: 8px;
+      color: var(--muted);
+      background: var(--surface);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .82rem;
+      line-height: 1.6;
+    }
+    @media (max-width: 760px) {
+      .rollout-grid { grid-template-columns: 1fr; }
+      .rollout-card { width: min(100%, 34rem); margin-inline: auto; }
+      .rollout-wheel { align-self: center; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(100% - 28px, var(--max-width)); }
+      .publication-header { padding-top: 2.2rem; }
+      .publication-title { font-size: clamp(1rem, 5vw, 1.8rem); }
+      .publication-authors { font-size: 1.05rem; }
+      .section { padding-bottom: 2.4rem; }
+      .abstract-section { padding-bottom: 1rem; }
+      .media-frame { width: 100%; }
+      .abstract-card { padding: 1.5rem; }
+      .abstract-copy { font-size: 1rem; text-align: left; }
+      h2.section-title { font-size: 1.75rem; }
+      .rollout-film-labels { font-size: .68rem; }
+      .figure-caption { font-size: .86rem; }
+      .content p { text-align: left; }
+    }
+    @media (max-width: 680px) {
+      .figure--attention { grid-template-columns: 1fr; gap: .8rem; }
+      .figure--attention > img, .figure--attention .figure-caption { grid-column: 1; grid-row: auto; }
+      .figure--attention .figure-caption { padding-left: .9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .rollout-wheel-stop { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="publication-header">
+    <div class="container">
+      <h1 class="publication-title"><span class="title-line">LeWAM: End-to-End World and</span><span class="title-line">Action Modeling with JEPAs</span></h1>
+
+      <div class="publication-authors">
+        <span class="author-block">Minghao Fu<sup>1,*</sup></span>
+        <span class="author-block">Tavis Siebert<sup>2,*</sup></span>
+        <span class="author-block">Eryk Halicki<sup>3</sup></span>
+        <span class="author-block">Randall Balestriero<sup>4,5</sup></span>
+      </div>
+      <div class="publication-affiliations" aria-label="Author affiliations">
+        <span><sup>1</sup>UC San Diego</span>
+        <span><sup>2</sup>ETH Zurich</span>
+        <span><sup>3</sup>University of British Columbia</span>
+        <span><sup>4</sup>Brown University</span>
+        <span><sup>5</sup>AMI Labs</span>
+      </div>
+      <p class="publication-contribution">* Equal contribution.</p>
+
+      <div class="publication-links" aria-label="Project resources">
+        <a class="paper-button" href="static/paper/lewam.pdf" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v5h5M8 15h8M8 18h6"/></svg><span>Paper</span>
+        </a>
+        <a class="paper-button" href="https://github.com/MinghaoFu/lewam" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-2-11-4 14"/></svg><span>Code</span>
+        </a>
+        <a class="paper-button" href="https://huggingface.co/LeWAM" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5m-9 5v10"/></svg><span>Data &amp; Checkpoints</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="teaser" aria-label="LeWAM overview">
+      <div class="container">
+        <figure class="media-frame">
+          <img width="800" height="450" src="static/images/paper/lewam_teaser_v33.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure, ten tasks, animated goal-reaching and long-horizon results, latent probing and explained SIGReg, encoder, and action-distribution ablations, three behavior cloning trajectories, and physical-robot task videos">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section abstract-section" id="abstract">
+      <div class="container">
+        <div class="abstract-card">
+          <h2 class="section-title">Abstract</h2>
+          <p class="abstract-copy">Joint-embedding predictive architectures (JEPAs) learn compact latent world models without pixel reconstruction. However, existing JEPAs typically learn representations and dynamics independently of downstream control objectives, complicating the pipeline and leaving unexplored how world- and action- learning benefit each other. We introduce <strong>LeWAM</strong>, an end-to-end JEPA for control with: (1) a joint training objective over next latent state prediction and action flow matching, and (2) an isotropic Gaussian constraint on the latent state, enabling a single model to support direct policy execution and efficient planning by evaluating sampled actions with its learned latent dynamics. Compared with prior JEPAs in visual planning, LeWAM improves success rate from 26.8% to 85.5% on contact-rich tasks and from 10.9% to 46.2% on long-horizon tasks, and plans 32.3× faster. On behavior cloning tasks in simulation and physical robots, LeWAM is also competitive with established methods. Interpretability analyses show that LeWAM learns control-relevant representations and action distributions effectively guiding test-time planning and control.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section methodology-section" id="approach">
+      <div class="container">
+        <h2 class="section-title">Joint World- and Action- Learning</h2>
+        <div class="architecture-details">
+          <h3>Architecture details</h3>
+          <p><strong>Model architecture.</strong> A shared encoder maps images to latent states. A mixture of transformers (MoT) predictor uses history latents to predict future states from clean actions and an action velocity field from noisy actions.</p>
+          <div class="formula model-interface" aria-label="The encoder maps an image to a latent state. The predictor's state branch predicts a future latent state, and its action branch predicts action velocities.">
+            <div><i>z</i><sub>t</sub> = Enc(<i>o</i><sub>t</sub>)</div>
+            <div><i>ẑ</i><sub>t+K</sub> = <i>f</i><sub>z</sub>(<i>q</i><sup>z</sup><sub>t+K</sub>; <i>z</i><sub>≤t</sub>, <i>A</i><sub>t,K</sub>)</div>
+            <div><i>v̂</i><sub>t,C</sub> = <i>f</i><sub>a</sub>(<i>A</i><sup>(s)</sup><sub>t,C</sub>; <i>s</i>, <i>z</i><sub>≤t</sub>, <i>c</i><sub>t</sub>)</div>
+          </div>
+          <p>Integrating the velocity field generates action chunks. Goal and horizon information condition only the action branch.</p>
+          <p><strong>Training objective.</strong> We jointly train the encoder and predictor with latent prediction, action flow matching, and SIGReg regularization.</p>
+          <div class="formula" aria-label="Training loss equals dynamics loss plus action loss plus weighted SIGReg loss">ℒ<sub>LeWAM</sub> = ℒ<sub>dyn</sub> + ℒ<sub>act</sub> + λ<sub>sig</sub> ℒ<sub>SIGReg</sub></div>
+          <p>SIGReg encourages an isotropic Gaussian latent distribution.</p>
+        </div>
+        <figure class="figure figure--method">
+          <img width="2400" height="624" src="static/images/paper/lewam_method_overview.png" loading="lazy" alt="LeWAM trains image and action streams together through a shared predictor with state and action prediction objectives">
+          <figcaption class="figure-caption"><strong>LeWAM training.</strong> Joint latent state prediction and action flow matching.</figcaption>
+        </figure>
+        <figure class="figure figure--attention">
+          <img width="2400" height="1924" src="static/images/paper/lewam_attention.png" loading="lazy" alt="Grouped MoT attention mask separating history, clean actions, state queries, and causal action-flow queries">
+          <figcaption class="figure-caption"><strong>MoT attention.</strong> Filled cells permit attention, while white cells are masked. The state query reads history and clean actions, and noisy action tokens read state history and their own causal prefix. Small grids show causal attention. Arrows mark the state branch and action velocity branch.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="planning">
+      <div class="container">
+        <h2 class="section-title">Latent Joint Imaginations</h2>
+        <p class="section-lede">Sample and refine plans through learned latent dynamics.</p>
+        <figure class="figure">
+          <img width="2400" height="626" src="static/images/paper/lewam_planning.png" loading="lazy" alt="Autoregressive action and latent rollouts followed by candidate refinement using dynamics gradients">
+          <figcaption class="figure-caption"><strong>Planning loop.</strong> Sample → imagine → refine → execute.</figcaption>
+        </figure>
+        <div class="section-copy">
+          <p>LeWAM alternates action sampling with latent-state prediction to build candidate plans. It refines the candidates through the frozen dynamics using terminal latent goal error and a proximity penalty, then selects the lowest-cost iterate.</p>
+          <div class="formula" aria-label="Terminal goal cost is the mean squared error between the predicted final latent state and the encoded goal">C(a) = MSE(ẑ<sub>t+L</sub>(a), z<sub>g</sub>)</div>
+          <p>Execute the first K planned actions and replan from the next observation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="experiments">
+      <div class="container">
+        <h2 class="section-title">Evaluation Protocol</h2>
+        <h3 class="subsection-title">Heterogeneous Simulated Environments</h3>
+        <p class="section-lede">We evaluate control across ten simulated navigation and manipulation environments.</p>
+        <figure class="wf8-figure" aria-label="Ten simulated tasks with representative trajectories">
+          <div class="wf8-paper-scroll">
+            <div class="wf8-paper">
+              <img class="wf8-paper-base" width="2577" height="1019" src="static/images/paper/worldforge10_overview.png" alt="Paper figure showing ten tasks in two rows, with the five task attributes in a legend on the left and attribute symbols beneath each task">
+              <div class="wf8-grid" id="wf8Grid" aria-label="Ten trajectory videos placed within the paper figure"></div>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="visual-planning">
+      <div class="container">
+        <h2 class="section-title">Visual Planning with LeWAM</h2>
+        <h3 class="subsection-title">Visual planning across ten simulated environments</h3>
+        <figure class="figure">
+          <div class="paper-reveal" id="shortHorizonReveal">
+            <img width="2400" height="1127" src="static/images/paper/sr_short_horizon.png" alt="Short-horizon visual goal-reaching success rates across ten simulated tasks">
+            <video class="paper-reveal-video" width="1200" height="564" muted playsinline preload="auto" poster="static/images/paper/sr_short_horizon_start.png" aria-hidden="true" tabindex="-1">
+              <source src="static/videos/paper/sr_short_horizon_reveal.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption class="figure-caption">50-action budget · 10 tasks · mean success: <strong>91.9% LeWAM</strong> vs 46.9% LeWM (CEM).</figcaption>
+        </figure>
+
+        <h3 class="subsection-title">Long-horizon planning</h3>
+        <figure class="figure">
+          <div class="paper-reveal" id="longHorizonReveal">
+            <img width="2400" height="477" src="static/images/paper/planning_horizon.png" alt="Goal-reaching performance at 25, 50, 75, and 100 steps across four tasks">
+            <video class="paper-reveal-video" width="1200" height="238" muted playsinline preload="auto" poster="static/images/paper/planning_horizon_start.png" aria-hidden="true" tabindex="-1">
+              <source src="static/videos/paper/planning_horizon_reveal.mp4" type="video/mp4">
+            </video>
+          </div>
+          <figcaption class="figure-caption">4 tasks · mean success at a 100-step goal offset: <strong>46.2% LeWAM</strong> vs 10.9% LeWM (CEM).</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="physical-understanding">
+      <div class="container">
+        <h2 class="section-title">Understanding LeWAM's Dynamics, Representations, and Actions</h2>
+        <h3 class="subsection-title">Latent representation probing</h3>
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Push-T probes and effective rank.</caption>
+            <thead><tr><th scope="col">Model</th><th scope="col">SIGReg</th><th scope="col">Effective rank</th><th scope="col">Object R²</th><th scope="col">Proprio R²</th><th scope="col">Action R² (IDM)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">LeWAM</th><td>Yes</td><td>42.90</td><td>0.90</td><td>0.86</td><td>0.40 (0.75)</td></tr>
+              <tr><th scope="row">LeWAM</th><td>No</td><td>8.20</td><td>0.69</td><td>0.86</td><td>0.38 (0.73)</td></tr>
+              <tr><th scope="row">LeWM</th><td>Yes</td><td>94.2</td><td>0.95</td><td>0.80</td><td>0.29 (0.71)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="figure-caption">Action (IDM) predicts the action chunk from the current latent state; parenthesized values use both current and future states.</p>
+        <figure class="figure">
+          <img width="2400" height="586" src="static/images/paper/model_ablations.png" loading="lazy" alt="Model ablations for representation regularization, encoder and action choices, and goal-free task completion">
+          <figcaption class="figure-caption"><strong>Ablations.</strong> SIGReg, encoder, action model, and goal-free control.</figcaption>
+        </figure>
+
+        <h3 class="subsection-title" id="model-rollouts">Visual Reconstructions and<br>Action-Conditioned Rollouts</h3>
+        <div class="rollout-stage">
+            <div class="rollout-grid" aria-label="Synchronized rollout comparisons">
+            <figure class="rollout-card" data-task="pusht">
+              <div class="rollout-film"><div class="rollout-film-labels" aria-hidden="true"><span>Recorded</span><span>LeWAM</span><span>LeWM</span></div><video width="672" height="224" autoplay muted loop playsinline preload="metadata" aria-label="Push-T comparison"></video></div>
+              <figcaption>Push-T</figcaption>
+            </figure>
+            <figure class="rollout-card" data-task="cube">
+              <div class="rollout-film"><div class="rollout-film-labels" aria-hidden="true"><span>Recorded</span><span>LeWAM</span><span>LeWM</span></div><video width="672" height="224" autoplay muted loop playsinline preload="metadata" aria-label="Cube comparison"></video></div>
+              <figcaption>Cube</figcaption>
+            </figure>
+            <figure class="rollout-card" data-task="scene">
+              <div class="rollout-film"><div class="rollout-film-labels" aria-hidden="true"><span>Recorded</span><span>LeWAM</span><span>LeWM</span></div><video width="672" height="224" autoplay muted loop playsinline preload="metadata" aria-label="Scene comparison"></video></div>
+              <figcaption>Scene</figcaption>
+            </figure>
+            <figure class="rollout-card" data-task="puzzle">
+              <div class="rollout-film"><div class="rollout-film-labels" aria-hidden="true"><span>Recorded</span><span>LeWAM</span><span>LeWM</span></div><video width="672" height="224" autoplay muted loop playsinline preload="metadata" aria-label="Puzzle comparison"></video></div>
+              <figcaption>Puzzle</figcaption>
+            </figure>
+            </div>
+            <div class="rollout-wheel" id="rolloutWheel" data-mode="encdec" role="slider" tabindex="0" aria-label="Visualization" aria-orientation="vertical" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" aria-valuetext="Reconstruction, example 1">
+              <span class="rollout-wheel-stop" data-mode="encdec" data-example="1" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-mode="preddec" data-example="1" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-mode="encdec" data-example="2" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-mode="preddec" data-example="2" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-mode="encdec" data-example="3" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-mode="preddec" data-example="3" aria-hidden="true"></span>
+              <span class="rollout-wheel-front" aria-hidden="true"></span>
+            </div>
+        </div>
+        <div class="section-copy rollout-caption">
+          <p>Both models use the recorded actions from the LeWAM trajectory shown in the first column. We train post-hoc decoders on frozen LeWAM, map their latent states back to images as visualization.</p>
+          <p>Open-loop prediction rolls forward from the initial frames. Reconstruction encodes and decodes each observed frame. The goal frame is 25 steps ahead.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="robots">
+      <div class="container">
+        <h2 class="section-title">Behavior Cloning and Physical Robot Control</h2>
+        <h3 class="subsection-title">Task completion in simulation</h3>
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Behavior cloning · success rate (%), mean ± SD across three seeds.</caption>
+            <thead><tr><th scope="col">Method</th><th scope="col">DrawerCleanup</th><th scope="col">Transport</th><th scope="col">ToolHang</th><th scope="col">Average</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Diffusion Policy</th><td>54.7 ± 1.2</td><td>45.3 ± 9.0</td><td>84.7 ± 3.1</td><td>61.6</td></tr>
+              <tr><th scope="row">LeWAM</th><td>52.7 ± 5.0</td><td>61.3 ± 9.9</td><td>80.0 ± 3.5</td><td>64.7</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="figure-caption">Direct control from observation history, without a goal image.</p>
+
+        <h3 class="subsection-title">Physical-robot control</h3>
+        <p class="section-lede">Three tasks · 30 trials per method, per task.</p>
+        <figure class="figure robot-demonstrations">
+          <video width="2400" height="400" muted loop playsinline preload="none" poster="static/images/real_robot/task_demonstrations.png" src="static/videos/real_robot/task_demonstrations.mp4" aria-label="Scene and wrist demonstrations for Pick and Place T, Push-T, and Tape Stack"></video>
+          <figcaption class="figure-caption">Pick and Place T · Push-T · Tape Stack</figcaption>
+        </figure>
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Successes out of 30 trials; GFLOPs per action chunk.</caption>
+            <thead><tr><th scope="col">Method</th><th scope="col">Pick and Place T</th><th scope="col">Push-T</th><th scope="col">Tape Stack</th><th scope="col">Average</th><th scope="col">GFLOPs</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Diffusion Policy</th><td>19 / 30</td><td>16 / 30</td><td>0 / 30</td><td>38.9%</td><td>270.0</td></tr>
+              <tr><th scope="row">π<sub>0.5</sub></th><td>14 / 30</td><td>3 / 30</td><td>9 / 30</td><td>28.9%</td><td>3603.6</td></tr>
+              <tr><th scope="row">LeWAM, frozen V-JEPA 2.1</th><td>15 / 30</td><td>12 / 30</td><td>5 / 30</td><td>35.6%</td><td>270.2</td></tr>
+              <tr><th scope="row">LeWAM, end-to-end</th><td>16 / 30</td><td>8 / 30</td><td>6 / 30</td><td>33.3%</td><td>270.2</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="figure-caption"><strong>13.3× fewer operations</strong> than π<sub>0.5</sub> per action chunk.</p>
+        <div class="section-copy">
+          <p>A scene camera and a wrist camera provide observations for the seven-DoF robot. The robot executes joint targets at 30 Hz using action chunks from a remote inference machine. GFLOPs include all denoising steps for one action chunk.</p>
+        </div>
+        <h3 class="subsection-title">Visual Reconstructions and<br>Action-Conditioned Rollouts</h3>
+        <div class="robot-probe-panel" id="robotProbePanel">
+          <div class="robot-probe-controls">
+            <div class="media-tabs" role="group" aria-label="Physical robot task">
+              <button type="button" aria-pressed="true" data-robot-task="pick_place">Pick and Place T</button>
+              <button type="button" aria-pressed="false" data-robot-task="push_t">Push-T</button>
+              <button type="button" aria-pressed="false" data-robot-task="tape_stack">Tape Stack</button>
+            </div>
+          </div>
+          <div class="robot-probe-stage">
+          <div class="robot-probe-task" data-task="pick_place">
+            <div class="robot-probe-models">
+              <h4>LeWAM, end-to-end</h4>
+              <h4>LeWAM, frozen V-JEPA 2.1</h4>
+            </div>
+            <div class="robot-probe-grid" aria-label="Pick and Place T: encoder variants in columns, camera views in rows">
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/pick_place_scene_end_to_end.png" src="static/videos/real_robot/pick_place_scene_end_to_end.mp4" aria-label="Pick and Place T, scene camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/pick_place_scene_frozen.png" src="static/videos/real_robot/pick_place_scene_frozen.mp4" aria-label="Pick and Place T, scene camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/pick_place_wrist_end_to_end.png" src="static/videos/real_robot/pick_place_wrist_end_to_end.mp4" aria-label="Pick and Place T, wrist camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/pick_place_wrist_frozen.png" src="static/videos/real_robot/pick_place_wrist_frozen.mp4" aria-label="Pick and Place T, wrist camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="robot-probe-task" data-task="push_t" hidden>
+            <div class="robot-probe-models">
+              <h4>LeWAM, end-to-end</h4>
+              <h4>LeWAM, frozen V-JEPA 2.1</h4>
+            </div>
+            <div class="robot-probe-grid" aria-label="Push-T: encoder variants in columns, camera views in rows">
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/push_t_scene_end_to_end.png" src="static/videos/real_robot/push_t_scene_end_to_end.mp4" aria-label="Push-T, scene camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/push_t_scene_frozen.png" src="static/videos/real_robot/push_t_scene_frozen.mp4" aria-label="Push-T, scene camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/push_t_wrist_end_to_end.png" src="static/videos/real_robot/push_t_wrist_end_to_end.mp4" aria-label="Push-T, wrist camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/push_t_wrist_frozen.png" src="static/videos/real_robot/push_t_wrist_frozen.mp4" aria-label="Push-T, wrist camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="robot-probe-task" data-task="tape_stack" hidden>
+            <div class="robot-probe-models">
+              <h4>LeWAM, end-to-end</h4>
+              <h4>LeWAM, frozen V-JEPA 2.1</h4>
+            </div>
+            <div class="robot-probe-grid" aria-label="Tape Stack: encoder variants in columns, camera views in rows">
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/tape_stack_scene_end_to_end.png" src="static/videos/real_robot/tape_stack_scene_end_to_end.mp4" aria-label="Tape Stack, scene camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="scene" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/tape_stack_scene_frozen.png" src="static/videos/real_robot/tape_stack_scene_frozen.mp4" aria-label="Tape Stack, scene camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Scene</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="end_to_end" muted loop playsinline preload="none" poster="static/images/real_robot/tape_stack_wrist_end_to_end.png" src="static/videos/real_robot/tape_stack_wrist_end_to_end.mp4" aria-label="Tape Stack, wrist camera, LeWAM, end-to-end: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+              <figure class="robot-probe-card">
+                <div class="rollout-film">
+                  <div class="rollout-film-labels" aria-hidden="true"><span>GT</span><span>Reconstruction</span><span>Prediction</span></div>
+                  <video width="768" height="256" data-camera="wrist" data-model="frozen" muted loop playsinline preload="none" poster="static/images/real_robot/tape_stack_wrist_frozen.png" src="static/videos/real_robot/tape_stack_wrist_frozen.mp4" aria-label="Tape Stack, wrist camera, LeWAM, frozen V-JEPA 2.1: GT, reconstruction, and action-conditioned prediction"></video>
+                </div>
+                <figcaption>Wrist</figcaption>
+              </figure>
+            </div>
+          </div>
+            <div class="rollout-wheel robot-sample-wheel" id="robotSampleWheel" role="slider" tabindex="0" aria-label="Video sample" aria-orientation="vertical" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-valuetext="Sample 1 of 3">
+              <span class="rollout-wheel-stop" data-sample="1" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-sample="2" aria-hidden="true"></span>
+              <span class="rollout-wheel-stop" data-sample="3" aria-hidden="true"></span>
+              <span class="rollout-wheel-front" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+        <p class="figure-caption">Post-hoc decoders visualize both LeWAM variants. Reconstructions decode each observed frame; predictions roll forward from the initial context under the recorded actions.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function () {
+      var tasks = [
+        { name:'Two-Room', video:'tworoom', poster:'tworoom' },
+        { name:'Reacher', video:'reacher', poster:'reacher' },
+        { name:'Push-T', video:'pusht', poster:'pusht' },
+        { name:'Cube', video:'cube', poster:'cube' },
+        { name:'PointMaze-Large', video:'pointmaze_large_ep0911_224x224', poster:'pointmaze_large_ep0911' },
+        { name:'Scene', video:'scene', poster:'scene' },
+        { name:'Puzzle', video:'puzzle', poster:'puzzle' },
+        { name:'ToolHang', video:'toolhang', poster:'tool_hang' },
+        { name:'Transport', video:'transport', poster:'transport' },
+        { name:'DrawerCleanup', video:'drawer', poster:'drawer_cleanup' }
+      ];
+
+      function renderWorldForge() {
+        var grid = document.getElementById('wf8Grid');
+        if (!grid) return;
+
+        // Interior frame positions measured against the current paper figure (2400 × 950).
+        var columns = [418, 828, 1238, 1647, 2057];
+        grid.innerHTML = tasks.map(function (task, index) {
+          var left = (columns[index % 5] / 2400 * 100).toFixed(6);
+          var top = ((index < 5 ? 32 : 516) / 950 * 100).toFixed(6);
+          return '<video class="wf8-video" style="left:' + left + '%;top:' + top + '%" autoplay muted loop playsinline preload="metadata" poster="static/images/worldforge8/' + task.poster + '.png" aria-label="' + task.name + ' trajectory">' +
+            '<source src="static/videos/worldforge8/' + task.video + '.mp4" type="video/mp4"></video>';
+        }).join('');
+
+        var videos = Array.prototype.slice.call(grid.querySelectorAll('video'));
+        if ('IntersectionObserver' in window) {
+          var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) entry.target.play().catch(function () {});
+              else entry.target.pause();
+            });
+          }, { rootMargin:'120px 0px', threshold:.05 });
+          videos.forEach(function (video) { observer.observe(video); });
+        }
+      }
+
+      renderWorldForge();
+
+      function revealPaperFigure(id) {
+        var chart = document.getElementById(id);
+        if (!chart || !('IntersectionObserver' in window)) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var video = chart.querySelector('video');
+        var active = false;
+        var failed = false;
+        var playback = 0;
+        function finish() {
+          if (active) chart.classList.add('is-complete');
+        }
+        video.addEventListener('ended', finish);
+        video.addEventListener('error', function () {
+          failed = true;
+          chart.classList.add('is-complete');
+        }, { once: true });
+        var observer = new IntersectionObserver(function (entries) {
+          if (failed) return;
+          var entry = entries[0];
+          if (!entry.isIntersecting) {
+            active = false;
+            playback += 1;
+            video.pause();
+            video.currentTime = 0;
+            chart.classList.remove('is-complete');
+          } else if (!active && entry.intersectionRatio >= .25) {
+            active = true;
+            var attempt = ++playback;
+            chart.classList.remove('is-complete');
+            video.currentTime = 0;
+            video.play().catch(function () {
+              if (attempt === playback) finish();
+            });
+          }
+        }, { threshold: [0, .25] });
+        chart.classList.add('is-ready');
+        observer.observe(chart);
+      }
+
+      revealPaperFigure('shortHorizonReveal');
+      revealPaperFigure('longHorizonReveal');
+
+      function renderModelRollouts() {
+        var wheel = document.getElementById('rolloutWheel');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.rollout-card'));
+        if (!wheel || cards.length !== 4) return;
+        var stops = Array.prototype.slice.call(wheel.querySelectorAll('.rollout-wheel-stop'));
+        var position = 0;
+        var pointerStart = null;
+        var wheelDelta = 0;
+        var videoLoadTimer = null;
+        var loadedIndex = -1;
+
+        function selectedIndex() { return ((position % 6) + 6) % 6; }
+
+        function selectedEntry() {
+          var selected = selectedIndex();
+          return {
+            index: selected,
+            example: stops[selected].getAttribute('data-example'),
+            mode: stops[selected].getAttribute('data-mode')
+          };
+        }
+
+        function renderWheel(coordinate) {
+          stops.forEach(function (stop, index) {
+            var offset = ((index - coordinate + 9) % 6 + 6) % 6 - 3;
+            var distance = Math.abs(offset);
+            var widthScale = 1 + Math.max(0, 1 - distance) * .65;
+            var heightScale = 1 - Math.min(distance, 2) * .13;
+            stop.style.transform = 'translate(-50%, -50%) translateY(' + (offset * 35) + 'px) scale(' + widthScale + ', ' + heightScale + ')';
+            stop.style.opacity = distance < 2.5 ? '1' : '0';
+            stop.classList.toggle('is-active', distance < .5);
+          });
+        }
+
+        function updateSelection() {
+          var entry = selectedEntry();
+          var selected = entry.index;
+          var example = entry.example;
+          var mode = entry.mode;
+          var description = (mode === 'preddec' ? 'Prediction' : 'Reconstruction') + ', example ' + example;
+          renderWheel(position);
+          wheel.setAttribute('data-mode', mode);
+          wheel.setAttribute('aria-valuenow', String(selected + 1));
+          wheel.setAttribute('aria-valuetext', description);
+        }
+
+        function loadSelection() {
+          var entry = selectedEntry();
+          var selected = entry.index;
+          if (selected === loadedIndex) return;
+          loadedIndex = selected;
+          var example = entry.example;
+          var mode = entry.mode;
+          cards.forEach(function (card) {
+            var task = card.getAttribute('data-task');
+            var video = card.querySelector('video');
+            var root = 'static/videos/model_rollouts/' + task + '/' + example + '/';
+            video.pause();
+            video.poster = 'static/images/model_rollouts/' + task + '/' + example + '/comparison_' + mode + '.png';
+            video.src = root + 'comparison_' + mode + '.mp4';
+            video.setAttribute('aria-label', card.querySelector('figcaption').textContent + ' example ' + example + ': recorded trajectory, LeWAM, and LeWM ' + (mode === 'preddec' ? 'open-loop prediction' : 'frame reconstruction'));
+            video.load();
+            var bounds = video.getBoundingClientRect();
+            if (bounds.top < window.innerHeight && bounds.bottom > 0) video.play().catch(function () {});
+          });
+        }
+
+        function setPosition(next, deferVideoLoad) {
+          if (next === position) return;
+          position = next;
+          updateSelection();
+          window.clearTimeout(videoLoadTimer);
+          if (deferVideoLoad) videoLoadTimer = window.setTimeout(loadSelection, 140);
+          else loadSelection();
+        }
+
+        wheel.addEventListener('wheel', function (event) {
+          event.preventDefault();
+          wheelDelta += event.deltaY;
+          if (Math.abs(wheelDelta) >= 35) {
+            setPosition(position + Math.sign(wheelDelta));
+            wheelDelta = 0;
+          }
+        }, { passive: false });
+        wheel.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') setPosition(position + 1);
+          else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') setPosition(position - 1);
+          else if (event.key === 'Home') setPosition(position - selectedIndex());
+          else if (event.key === 'End') setPosition(position + 5 - selectedIndex());
+          else return;
+          event.preventDefault();
+        });
+        wheel.addEventListener('pointerdown', function (event) {
+          if (event.button !== 0 || pointerStart) return;
+          pointerStart = { id: event.pointerId, y: event.clientY, position: position, moved: false };
+          wheel.classList.add('is-dragging');
+          wheel.focus({ preventScroll: true });
+          wheel.setPointerCapture(event.pointerId);
+        });
+        wheel.addEventListener('pointermove', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          var distance = event.clientY - pointerStart.y;
+          if (!pointerStart.moved && Math.abs(distance) < 6) return;
+          pointerStart.moved = true;
+          var rotation = pointerStart.position - distance / 35;
+          setPosition(Math.round(rotation), true);
+          renderWheel(rotation);
+        });
+        wheel.addEventListener('pointerup', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          if (!pointerStart.moved) {
+            var center = wheel.getBoundingClientRect();
+            var step = Math.max(-2, Math.min(2, Math.round((event.clientY - center.top - center.height / 2) / 35)));
+            setPosition(position + step);
+          }
+          pointerStart = null;
+          wheel.classList.remove('is-dragging');
+          window.clearTimeout(videoLoadTimer);
+          renderWheel(position);
+          loadSelection();
+        });
+        wheel.addEventListener('pointercancel', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          pointerStart = null;
+          wheel.classList.remove('is-dragging');
+          window.clearTimeout(videoLoadTimer);
+          renderWheel(position);
+          loadSelection();
+        });
+        updateSelection();
+        loadSelection();
+        if ('IntersectionObserver' in window) {
+          var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) entry.target.play().catch(function () {});
+              else entry.target.pause();
+            });
+          }, { rootMargin: '120px 0px', threshold: .05 });
+          cards.forEach(function (card) { observer.observe(card.querySelector('video')); });
+        }
+      }
+
+      renderModelRollouts();
+
+      function renderRobotVideos() {
+        var demos = document.querySelectorAll('.robot-demonstrations video');
+        if ('IntersectionObserver' in window) {
+          var demoObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) entry.target.play().catch(function () {});
+              else entry.target.pause();
+            });
+          }, { threshold: .05 });
+          demos.forEach(function (video) { demoObserver.observe(video); });
+        } else {
+          demos.forEach(function (video) { video.play().catch(function () {}); });
+        }
+
+        var panel = document.getElementById('robotProbePanel');
+        if (!panel) return;
+        var groups = Array.prototype.slice.call(panel.querySelectorAll('.robot-probe-task'));
+        var taskButtons = panel.querySelectorAll('[data-robot-task]');
+        var wheel = document.getElementById('robotSampleWheel');
+        var stops = Array.prototype.slice.call(wheel.querySelectorAll('.rollout-wheel-stop'));
+        var task = 'pick_place';
+        var sample = 1;
+        var position = 0;
+        var pointerStart = null;
+        var wheelDelta = 0;
+        var videoLoadTimer = null;
+        var revision = 0;
+        var inView = !('IntersectionObserver' in window);
+        var activeGroup = null;
+        var needsReset = true;
+
+        function ready(video) {
+          if (video.readyState >= 2) return Promise.resolve();
+          return new Promise(function (resolve) {
+            function finish() {
+              video.removeEventListener('loadeddata', finish);
+              video.removeEventListener('error', finish);
+              resolve();
+            }
+            video.addEventListener('loadeddata', finish);
+            video.addEventListener('error', finish);
+            video.preload = 'auto';
+            video.load();
+          });
+        }
+
+        function startGroup() {
+          if (!inView || !activeGroup) return;
+          var ticket = revision;
+          var videos = Array.prototype.slice.call(activeGroup.querySelectorAll('video'));
+          Promise.all(videos.map(ready)).then(function () {
+            if (ticket !== revision || !inView) return;
+            videos.forEach(function (video) {
+              if (video.readyState < 2) return;
+              if (needsReset) video.currentTime = 0;
+              video.play().catch(function () {});
+            });
+            needsReset = false;
+          });
+        }
+
+        function selectGroup() {
+          revision += 1;
+          groups.forEach(function (group) {
+            var selected = group.getAttribute('data-task') === task;
+            group.querySelectorAll('video').forEach(function (video) { video.pause(); });
+            group.hidden = !selected;
+            if (selected) activeGroup = group;
+          });
+          taskButtons.forEach(function (button) {
+            button.setAttribute('aria-pressed', String(button.getAttribute('data-robot-task') === task));
+          });
+          activeGroup.querySelectorAll('video').forEach(function (video) {
+            var camera = video.getAttribute('data-camera');
+            var model = video.getAttribute('data-model');
+            var basename = task + '_' + camera + '_' + model + (sample === 1 ? '' : '_sample' + sample);
+            var source = 'static/videos/real_robot/' + basename + '.mp4';
+            if (video.getAttribute('src') !== source) {
+              video.preload = 'none';
+              video.poster = 'static/images/real_robot/' + basename + '.png';
+              video.src = source;
+              video.load();
+            }
+          });
+          needsReset = true;
+          startGroup();
+        }
+
+        function renderSampleWheel(coordinate) {
+          stops.forEach(function (stop, index) {
+            var offset = ((index - coordinate + 1.5) % 3 + 3) % 3 - 1.5;
+            var distance = Math.abs(offset);
+            var widthScale = 1 + Math.max(0, 1 - distance) * .65;
+            var heightScale = 1 - Math.min(distance, 1.5) * .13;
+            stop.style.transform = 'translate(-50%, -50%) translateY(' + (offset * 70) + 'px) scale(' + widthScale + ', ' + heightScale + ')';
+            stop.style.opacity = distance < 1.45 ? '1' : '0';
+            stop.classList.toggle('is-active', distance < .5);
+          });
+        }
+
+        function updateSample() {
+          sample = ((position % 3) + 3) % 3 + 1;
+          wheel.setAttribute('aria-valuenow', String(sample));
+          wheel.setAttribute('aria-valuetext', 'Sample ' + sample + ' of 3');
+          renderSampleWheel(position);
+        }
+
+        function setSamplePosition(next, deferVideoLoad) {
+          if (next === position) return;
+          position = next;
+          updateSample();
+          window.clearTimeout(videoLoadTimer);
+          if (deferVideoLoad) videoLoadTimer = window.setTimeout(selectGroup, 140);
+          else selectGroup();
+        }
+
+        wheel.addEventListener('wheel', function (event) {
+          event.preventDefault();
+          wheelDelta += event.deltaY;
+          if (Math.abs(wheelDelta) >= 35) {
+            setSamplePosition(position + Math.sign(wheelDelta));
+            wheelDelta = 0;
+          }
+        }, { passive: false });
+        wheel.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') setSamplePosition(position + 1);
+          else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') setSamplePosition(position - 1);
+          else if (event.key === 'Home') setSamplePosition(0);
+          else if (event.key === 'End') setSamplePosition(2);
+          else return;
+          event.preventDefault();
+        });
+        wheel.addEventListener('pointerdown', function (event) {
+          if (event.button !== 0 || pointerStart) return;
+          pointerStart = { id: event.pointerId, y: event.clientY, position: position, moved: false };
+          wheel.classList.add('is-dragging');
+          wheel.focus({ preventScroll: true });
+          wheel.setPointerCapture(event.pointerId);
+        });
+        wheel.addEventListener('pointermove', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          var distance = event.clientY - pointerStart.y;
+          if (!pointerStart.moved && Math.abs(distance) < 6) return;
+          pointerStart.moved = true;
+          var rotation = pointerStart.position - distance / 70;
+          setSamplePosition(Math.round(rotation), true);
+          renderSampleWheel(rotation);
+        });
+        wheel.addEventListener('pointerup', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          if (!pointerStart.moved) {
+            var bounds = wheel.getBoundingClientRect();
+            var step = Math.max(-1, Math.min(1, Math.round((event.clientY - bounds.top - bounds.height / 2) / 70)));
+            setSamplePosition(position + step);
+          }
+          pointerStart = null;
+          wheel.classList.remove('is-dragging');
+          window.clearTimeout(videoLoadTimer);
+          renderSampleWheel(position);
+          selectGroup();
+        });
+        wheel.addEventListener('pointercancel', function (event) {
+          if (!pointerStart || event.pointerId !== pointerStart.id) return;
+          pointerStart = null;
+          wheel.classList.remove('is-dragging');
+          window.clearTimeout(videoLoadTimer);
+          renderSampleWheel(position);
+          selectGroup();
+        });
+
+        taskButtons.forEach(function (button) {
+          button.addEventListener('click', function () {
+            task = button.getAttribute('data-robot-task');
+            window.clearTimeout(videoLoadTimer);
+            selectGroup();
+          });
+        });
+        groups.forEach(function (group) {
+          var videos = Array.prototype.slice.call(group.querySelectorAll('video'));
+          videos[0].addEventListener('timeupdate', function () {
+            if (group !== activeGroup || !inView) return;
+            videos.slice(1).forEach(function (video) {
+              if (video.readyState < 2 || video.paused) return;
+              if (Math.abs(videos[0].currentTime - video.currentTime) > .15) video.currentTime = videos[0].currentTime;
+            });
+          });
+        });
+        updateSample();
+        selectGroup();
+        if ('IntersectionObserver' in window) {
+          var probeObserver = new IntersectionObserver(function (entries) {
+            inView = entries[0].isIntersecting;
+            if (inView) startGroup();
+            else if (activeGroup) activeGroup.querySelectorAll('video').forEach(function (video) { video.pause(); });
+          }, { threshold: .05 });
+          probeObserver.observe(panel);
+        }
+      }
+
+      renderRobotVideos();
+    }());
+  </script>
+</body>
+</html>
