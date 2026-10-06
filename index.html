@@ -89,7 +89,7 @@
     }
     .paper-button:hover { color: var(--muted); background: #eeeeee; }
     .paper-button svg { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .paper-button[aria-disabled="true"] { opacity: .62; cursor: default; }
+    .paper-button[aria-disabled="true"] { color: #9b9b9b; background: #f5f5f5; opacity: .62; cursor: default; }
     .paper-button:focus-visible, video:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
 
     .teaser { padding: 1.25rem 0 2.5rem; }
@@ -293,9 +293,9 @@
       <p class="publication-contribution">* Equal contribution.</p>
 
       <div class="publication-links" aria-label="Project resources">
-        <a class="paper-button" href="static/paper/lewam.pdf?v=arxiv-20261005" rel="noopener noreferrer">
+        <button class="paper-button" type="button" disabled aria-disabled="true">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v5h5M8 15h8M8 18h6"/></svg><span>Paper</span>
-        </a>
+        </button>
         <a class="paper-button" href="https://github.com/MinghaoFu/lewam" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-2-11-4 14"/></svg><span>Code</span>
         </a>
