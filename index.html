@@ -310,7 +310,7 @@
     <section class="teaser" aria-label="LeWAM overview">
       <div class="container">
         <figure class="media-frame">
-          <img width="800" height="450" src="static/images/paper/lewam_teaser_v36.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure with fixed-center per-point gradient refinement before best-of-N selection, ten tasks, animated goal-reaching and long-horizon results, latent probing and explained SIGReg, encoder, and action-distribution ablations, three behavior cloning trajectories, and physical-robot task videos">
+          <img width="800" height="450" src="static/images/paper/lewam_teaser_v37.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure with fixed-center per-point gradient refinement before best-of-N selection, ten tasks, animated goal-reaching and long-horizon results, latent probing and animated SIGReg bars, encoder points and methods, MSE-to-stochastic comparisons, behavior-cloning bars with three task trajectories, and physical-robot task videos">
         </figure>
       </div>
     </section>
@@ -432,7 +432,12 @@
         </div>
         <p class="figure-caption">Action predicts the action chunk from the current latent state; parenthesized IDM scores use both current and future states.</p>
         <figure class="figure">
-          <img width="2400" height="585" src="static/images/paper/model_ablations.png?v=arxiv-20261005" loading="lazy" alt="Current arXiv ablations: the role of SIGReg, visual encoder, stochastic versus MSE action heads, and behavior cloning">
+          <div class="paper-reveal" id="ablationReveal">
+            <img width="2400" height="585" src="static/images/paper/model_ablations.png?v=arxiv-20261005" loading="lazy" alt="Current arXiv ablations: the role of SIGReg, visual encoder, stochastic versus MSE action heads, and behavior cloning">
+            <video class="paper-reveal-video" width="1600" height="390" muted playsinline preload="auto" poster="static/images/paper/model_ablations_start.png" aria-hidden="true" tabindex="-1">
+              <source src="static/videos/paper/model_ablations_reveal.mp4" type="video/mp4">
+            </video>
+          </div>
           <figcaption class="figure-caption">(a) Planning gain from SIGReg. (b) Direct success and planning gain for visual encoders. (c) Planning gain for flow and MSE action heads. (d) Behavior-cloning success.</figcaption>
         </figure>
         <div class="section-copy">
@@ -731,6 +736,7 @@
 
       revealPaperFigure('shortHorizonReveal');
       revealPaperFigure('longHorizonReveal');
+      revealPaperFigure('ablationReveal');
 
       function renderModelRollouts() {
         var wheel = document.getElementById('rolloutWheel');
