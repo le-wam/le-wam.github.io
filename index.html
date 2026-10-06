@@ -293,7 +293,7 @@
       <p class="publication-contribution">* Equal contribution.</p>
 
       <div class="publication-links" aria-label="Project resources">
-        <a class="paper-button" href="static/paper/lewam.pdf" rel="noopener noreferrer">
+        <a class="paper-button" href="static/paper/lewam.pdf?v=arxiv-20261005" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v5h5M8 15h8M8 18h6"/></svg><span>Paper</span>
         </a>
         <a class="paper-button" href="https://github.com/MinghaoFu/lewam" rel="noopener noreferrer">
@@ -310,7 +310,7 @@
     <section class="teaser" aria-label="LeWAM overview">
       <div class="container">
         <figure class="media-frame">
-          <img width="800" height="450" src="static/images/paper/lewam_teaser_v34.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure with fixed-center per-point gradient refinement before best-of-N selection, ten tasks, animated goal-reaching and long-horizon results, latent probing and explained SIGReg, encoder, and action-distribution ablations, three behavior cloning trajectories, and physical-robot task videos">
+          <img width="800" height="450" src="static/images/paper/lewam_teaser_v35.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure with fixed-center per-point gradient refinement before best-of-N selection, ten tasks, animated goal-reaching and long-horizon results, latent probing and explained SIGReg, encoder, and action-distribution ablations, three behavior cloning trajectories, and physical-robot task videos">
         </figure>
       </div>
     </section>
@@ -319,7 +319,7 @@
       <div class="container">
         <div class="abstract-card">
           <h2 class="section-title">Abstract</h2>
-          <p class="abstract-copy">Joint-embedding predictive architectures (JEPAs) learn compact latent world models without pixel reconstruction. However, existing JEPAs typically learn representations and dynamics independently of downstream control objectives, complicating the pipeline and leaving unexplored how world- and action- learning benefit each other. We introduce <strong>LeWAM</strong>, an end-to-end JEPA for control with: (1) a joint training objective over next latent state prediction and action flow matching, and (2) an isotropic Gaussian constraint on the latent state, enabling a single model to support direct policy execution and efficient planning by evaluating sampled actions with its learned latent dynamics. Compared with prior JEPAs in visual planning, LeWAM improves success rate from 26.8% to 85.5% on contact-rich tasks and from 10.9% to 46.2% on long-horizon tasks, and plans 32.3× faster. On behavior cloning tasks in simulation and physical robots, LeWAM is also competitive with established methods. Interpretability analyses show that LeWAM learns control-relevant representations and action distributions effectively guiding test-time planning and control.</p>
+          <p class="abstract-copy">Joint-embedding predictive architectures (JEPAs) learn compact latent world models without pixel reconstruction. However, existing JEPAs typically learn representations and dynamics independently of downstream control objectives, complicating the pipeline and leaving unexplored how world- and action- learning benefit each other. We introduce <strong>LeWAM</strong>, an end-to-end JEPA for control with: (1) a joint training objective over next latent state prediction and action flow matching, and (2) an isotropic Gaussian constraint on the latent state, enabling a single model to support direct policy execution and efficient planning by evaluating sampled actions with its learned latent dynamics. Compared with prior JEPAs in visual planning, LeWAM improves success rate from 26.8% to 89.7% on contact-rich tasks and from 10.9% to 46.2% on long-horizon tasks, and plans 32.3× faster. On behavior cloning tasks in simulation and physical robots, LeWAM is also competitive with established methods. Interpretability analyses show that LeWAM learns control-relevant representations and action distributions effectively guiding test-time planning and control.</p>
         </div>
       </div>
     </section>
@@ -375,7 +375,7 @@
         <figure class="wf8-figure" aria-label="Ten simulated tasks with representative trajectories">
           <div class="wf8-paper-scroll">
             <div class="wf8-paper">
-              <img class="wf8-paper-base" width="2577" height="1019" src="static/images/paper/worldforge10_overview.png" alt="Paper figure showing ten tasks in two rows, with the five task attributes in a legend on the left and attribute symbols beneath each task">
+              <img class="wf8-paper-base" width="2400" height="950" src="static/images/paper/worldforge10_overview.png?v=arxiv-20261005" alt="Paper figure showing ten tasks in two rows, with the five task attributes in a legend on the left and attribute symbols beneath each task">
               <div class="wf8-grid" id="wf8Grid" aria-label="Ten trajectory videos placed within the paper figure"></div>
             </div>
           </div>
@@ -389,12 +389,12 @@
         <h3 class="subsection-title">Visual planning across ten simulated environments</h3>
         <figure class="figure">
           <div class="paper-reveal" id="shortHorizonReveal">
-            <img width="2400" height="1127" src="static/images/paper/sr_short_horizon.png" alt="Short-horizon visual goal-reaching success rates across ten simulated tasks">
-            <video class="paper-reveal-video" width="1200" height="564" muted playsinline preload="auto" poster="static/images/paper/sr_short_horizon_start.png" aria-hidden="true" tabindex="-1">
-              <source src="static/videos/paper/sr_short_horizon_reveal.mp4" type="video/mp4">
+            <img width="2400" height="1127" src="static/images/paper/sr_short_horizon.png?v=arxiv-20261005" alt="Short-horizon visual goal-reaching success rates across ten simulated tasks">
+            <video class="paper-reveal-video" width="1200" height="564" muted playsinline preload="auto" poster="static/images/paper/sr_short_horizon_start.png?v=arxiv-20261005" aria-hidden="true" tabindex="-1">
+              <source src="static/videos/paper/sr_short_horizon_reveal.mp4?v=arxiv-20261005" type="video/mp4">
             </video>
           </div>
-          <figcaption class="figure-caption">50-action budget · 10 tasks · mean success: <strong>91.9% LeWAM</strong> vs 46.9% LeWM (CEM).</figcaption>
+          <figcaption class="figure-caption">50-action budget · 10 tasks · mean success: <strong>93.5% LeWAM</strong> vs 46.9% LeWM (CEM).</figcaption>
         </figure>
 
         <h3 class="subsection-title">Long-horizon planning</h3>
@@ -414,22 +414,32 @@
       <div class="container">
         <h2 class="section-title">Understanding LeWAM's Dynamics, Representations, and Actions</h2>
         <h3 class="subsection-title">Latent representation probing</h3>
+        <div class="section-copy">
+          <p>Linear probes measure object, proprioceptive, and action information in the learned representations. Across four tasks, LeWAM improves mean proprioception, action, and inverse-dynamics R² over LeWM by 0.21, 0.20, and 0.19.</p>
+        </div>
         <div class="paper-table-wrap">
           <table class="paper-table">
-            <caption>Push-T probes and effective rank.</caption>
+            <caption>Push-T · ridge-regression R² and effective rank.</caption>
             <thead><tr><th scope="col">Model</th><th scope="col">SIGReg</th><th scope="col">Effective rank</th><th scope="col">Object R²</th><th scope="col">Proprio R²</th><th scope="col">Action R² (IDM)</th></tr></thead>
             <tbody>
               <tr><th scope="row">LeWAM</th><td>Yes</td><td>42.90</td><td>0.90</td><td>0.86</td><td>0.40 (0.75)</td></tr>
-              <tr><th scope="row">LeWAM</th><td>No</td><td>8.20</td><td>0.69</td><td>0.86</td><td>0.38 (0.73)</td></tr>
-              <tr><th scope="row">LeWM</th><td>Yes</td><td>94.2</td><td>0.95</td><td>0.80</td><td>0.29 (0.71)</td></tr>
+              <tr><th scope="row">LeWAM</th><td>No</td><td>10.94</td><td>0.88</td><td>0.85</td><td>0.38 (0.73)</td></tr>
+              <tr><th scope="row">LeWAM (MSE)</th><td>No</td><td>6.96</td><td>0.66</td><td>0.86</td><td>0.36 (0.74)</td></tr>
+              <tr><th scope="row">LeWM</th><td>Yes</td><td>94.20</td><td>0.95</td><td>0.80</td><td>0.29 (0.71)</td></tr>
+              <tr><th scope="row">LeWM</th><td>No</td><td>16.23</td><td>0.00</td><td>0.00</td><td>0.00 (0.00)</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="figure-caption">Action (IDM) predicts the action chunk from the current latent state; parenthesized values use both current and future states.</p>
+        <p class="figure-caption">Action predicts the action chunk from the current latent state; parenthesized IDM scores use both current and future states.</p>
         <figure class="figure">
-          <img width="2400" height="586" src="static/images/paper/model_ablations.png" loading="lazy" alt="Model ablations for representation regularization, encoder and action choices, and goal-free task completion">
-          <figcaption class="figure-caption"><strong>Ablations.</strong> SIGReg, encoder, action model, and goal-free control.</figcaption>
+          <img width="2400" height="585" src="static/images/paper/model_ablations.png?v=arxiv-20261005" loading="lazy" alt="Current arXiv ablations: the role of SIGReg, visual encoder, stochastic versus MSE action heads, and behavior cloning">
+          <figcaption class="figure-caption">(a) Planning gain from SIGReg. (b) Direct success and planning gain for visual encoders. (c) Planning gain for flow and MSE action heads. (d) Behavior-cloning success.</figcaption>
         </figure>
+        <div class="section-copy">
+          <p><strong>The role of SIGReg.</strong> Without SIGReg, both LeWAM action heads retain decodable information in Push-T, while LeWM scores zero on the reported probes. SIGReg also helps planning: LeWAM gains 14.7 percentage points over direct control with SIGReg, compared with 2.7 without it. Removing SIGReg lowers planning success by 25.3 points on Push-T, 4.0 on Scene, and 5.3 on Puzzle.</p>
+          <p><strong>Visual encoder.</strong> In the matched four-task comparison, training the encoder end-to-end gives 86.7% direct-control success, versus 79.0% with frozen DINOv2 CLS features and 75.8% with averaged patch features. Joint encoder training learns representations suited to control.</p>
+          <p><strong>Stochastic vs. MSE.</strong> Flow matching provides larger planning gains on the three tasks shown than Gaussian proposals around a deterministic MSE prediction. MSE learns a conditional mean; flow matching models the action distribution and can retain distinct modes of behavior.</p>
+        </div>
 
         <h3 class="subsection-title" id="model-rollouts">Visual Reconstructions and<br>Action-Conditioned Rollouts</h3>
         <div class="rollout-stage">
