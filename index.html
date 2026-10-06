@@ -102,6 +102,42 @@
       background: #fff;
     }
     .media-frame img { display: block; width: 100%; height: auto; }
+    .teaser-player { position: relative; overflow: visible; }
+    .teaser-player video { display: block; width: 100%; height: auto; border-radius: 6px; }
+    .teaser-player video::-webkit-media-controls { display: none !important; }
+    .teaser-progress {
+      position: absolute;
+      left: 4px;
+      bottom: -12px;
+      z-index: 2;
+      width: calc(100% - 8px);
+      height: 24px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      cursor: grab;
+      touch-action: none;
+    }
+    .teaser-progress:active { cursor: grabbing; }
+    .teaser-progress::-webkit-slider-runnable-track { height: 1px; border: 0; background: transparent; }
+    .teaser-progress::-moz-range-track { height: 1px; border: 0; background: transparent; }
+    .teaser-progress::-moz-range-progress { height: 1px; background: transparent; }
+    .teaser-progress::-webkit-slider-thumb {
+      width: 8px;
+      height: 8px;
+      margin-top: -3.5px;
+      border: 0;
+      border-radius: 50%;
+      -webkit-appearance: none;
+      background: var(--paper-blue);
+    }
+    .teaser-progress::-moz-range-thumb { width: 8px; height: 8px; border: 0; border-radius: 50%; background: var(--paper-blue); }
+    .teaser-progress:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--link); outline-offset: 2px; }
+    .teaser-progress:focus-visible::-moz-range-thumb { outline: 2px solid var(--link); outline-offset: 2px; }
 
     h2.section-title {
       margin: 0 0 1.5rem;
@@ -309,8 +345,11 @@
   <main>
     <section class="teaser" aria-label="LeWAM overview">
       <div class="container">
-        <figure class="media-frame">
-          <img width="800" height="450" src="static/images/paper/lewam_teaser_v37.gif" alt="Animated LeWAM teaser showing the paper training diagram, MoT input and output symbols with attention paths, planning figure with fixed-center per-point gradient refinement before best-of-N selection, ten tasks, animated goal-reaching and long-horizon results, latent probing and animated SIGReg bars, encoder points and methods, MSE-to-stochastic comparisons, behavior-cloning bars with three task trajectories, and physical-robot task videos">
+        <figure class="media-frame teaser-player" id="teaserPlayer">
+          <video id="teaserVideo" width="1280" height="720" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1" poster="static/images/paper/lewam_teaser_poster.png" aria-label="LeWAM animated teaser">
+            <source src="static/videos/paper/lewam_teaser_v37.mp4" type="video/mp4">
+          </video>
+          <input class="teaser-progress" id="teaserProgress" type="range" min="0" max="1000" step="1" value="0" aria-label="Teaser progress" disabled>
         </figure>
       </div>
     </section>
@@ -655,6 +694,94 @@
 
   <script>
     (function () {
+      function renderTeaser() {
+        var video = document.getElementById('teaserVideo');
+        var progress = document.getElementById('teaserProgress');
+        if (!video || !progress) return;
+        var dragging = false;
+        var animationFrame = 0;
+        var spokenTime = -1;
+
+        function hasDuration() {
+          return Number.isFinite(video.duration) && video.duration > 0;
+        }
+        function timeLabel(seconds) {
+          var whole = Math.floor(seconds);
+          return Math.floor(whole / 60) + ':' + String(whole % 60).padStart(2, '0');
+        }
+        function update() {
+          if (!hasDuration()) return;
+          progress.disabled = false;
+          if (!dragging) progress.value = video.currentTime / video.duration * 1000;
+          var whole = Math.floor(video.currentTime);
+          if (whole !== spokenTime) {
+            spokenTime = whole;
+            progress.setAttribute('aria-valuetext', timeLabel(video.currentTime) + ' of ' + timeLabel(video.duration));
+          }
+        }
+        function tick() {
+          animationFrame = 0;
+          update();
+          if (!video.paused && !dragging) animationFrame = window.requestAnimationFrame(tick);
+        }
+        function start() {
+          video.play().catch(function () {});
+        }
+        function seek(seconds) {
+          if (!hasDuration()) return;
+          video.currentTime = Math.max(0, Math.min(video.duration - .04, seconds));
+          update();
+        }
+        function finishDrag() {
+          if (!dragging) return;
+          seek(Number(progress.value) / 1000 * video.duration);
+          dragging = false;
+          update();
+          start();
+        }
+
+        video.addEventListener('loadedmetadata', function () { update(); start(); });
+        video.addEventListener('durationchange', update);
+        video.addEventListener('timeupdate', update);
+        video.addEventListener('seeked', update);
+        video.addEventListener('play', function () {
+          if (!animationFrame) animationFrame = window.requestAnimationFrame(tick);
+        });
+        video.addEventListener('pause', function () {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = 0;
+          update();
+        });
+        progress.addEventListener('pointerdown', function (event) {
+          if (!hasDuration() || !event.isPrimary || event.button !== 0) return;
+          dragging = true;
+          video.pause();
+        });
+        progress.addEventListener('input', function () {
+          seek(Number(progress.value) / 1000 * video.duration);
+        });
+        progress.addEventListener('change', finishDrag);
+        window.addEventListener('pointerup', finishDrag);
+        window.addEventListener('pointercancel', finishDrag);
+        window.addEventListener('blur', finishDrag);
+        progress.addEventListener('keydown', function (event) {
+          if (!hasDuration()) return;
+          var next;
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') next = video.currentTime - 5;
+          else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') next = video.currentTime + 5;
+          else if (event.key === 'Home') next = 0;
+          else if (event.key === 'End') next = video.duration - .04;
+          else return;
+          event.preventDefault();
+          seek(next);
+          if (!dragging) start();
+        });
+        update();
+        start();
+      }
+
+      renderTeaser();
+
       var tasks = [
         { name:'Two-Room', video:'tworoom', poster:'tworoom' },
         { name:'Reacher', video:'reacher', poster:'reacher' },
