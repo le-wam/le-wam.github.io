@@ -352,7 +352,7 @@
       <div class="container">
         <figure class="media-frame teaser-player" id="teaserPlayer">
           <video id="teaserVideo" width="1280" height="720" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1" poster="static/images/paper/lewam_teaser_poster.png?v=47" aria-label="LeWAM animated teaser">
-            <source src="static/videos/paper/lewam_teaser_v50.mp4" type="video/mp4">
+            <source src="static/videos/paper/lewam_teaser_v51.mp4" type="video/mp4">
           </video>
           <input class="teaser-progress" id="teaserProgress" type="range" min="0" max="1000" step="1" value="0" aria-label="Teaser progress" disabled>
         </figure>
@@ -477,6 +477,9 @@
           </table>
         </div>
         <p class="figure-caption">Action predicts the action chunk from the current latent state; parenthesized IDM scores use both current and future states.</p>
+        <div class="section-copy">
+          <p><strong>Action prediction as an anti-collapse signal.</strong> Without SIGReg, both LeWAM action heads retain decodable state and action information on Push-T, while LeWM scores zero on every reported probe. Observed actions provide targets independent of the encoder.</p>
+        </div>
         <figure class="figure">
           <div class="paper-reveal" id="ablationReveal">
             <img width="2400" height="585" src="static/images/paper/model_ablations.png?v=arxiv-20261005" loading="lazy" alt="Current arXiv ablations: the role of SIGReg, visual encoder, stochastic versus MSE action heads, and behavior cloning">
@@ -487,7 +490,7 @@
           <figcaption class="figure-caption">(a) Planning gain from SIGReg. (b) Direct success and planning gain for visual encoders. (c) Planning gain for flow and MSE action heads. (d) Behavior-cloning success.</figcaption>
         </figure>
         <div class="section-copy">
-          <p><strong>The role of SIGReg.</strong> Without SIGReg, both LeWAM action heads retain decodable information in Push-T, while LeWM scores zero on the reported probes. SIGReg also helps planning: LeWAM gains 14.7 percentage points over direct control with SIGReg, compared with 2.7 without it. Removing SIGReg lowers planning success by 25.3 points on Push-T, 4.0 on Scene, and 5.3 on Puzzle.</p>
+          <p><strong>The role of SIGReg.</strong> SIGReg also improves object-state decodability and planning. On Push-T, planning improves direct-control success by 14.7 percentage points with SIGReg, compared with 2.7 without it. Removing SIGReg lowers planning success by 25.3 points on Push-T, 4.0 on Scene, and 5.3 on Puzzle.</p>
           <p><strong>Visual encoder.</strong> In the matched four-task comparison, training the encoder end-to-end gives 86.7% direct-control success, versus 79.0% with frozen DINOv2 CLS features and 75.8% with averaged patch features. Joint encoder training learns representations suited to control.</p>
           <p><strong>Stochastic vs. MSE.</strong> Flow matching provides larger planning gains on the three tasks shown than Gaussian proposals around a deterministic MSE prediction. MSE learns a conditional mean; flow matching models the action distribution and can retain distinct modes of behavior. Without SIGReg, flow matching retains more object information than MSE (R²: 0.88 vs 0.66), with similar proprioception scores (0.85 vs 0.86). In the two-door navigation experiment, the flow head captures both routes.</p>
         </div>
