@@ -352,7 +352,7 @@
       <div class="container">
         <figure class="media-frame teaser-player" id="teaserPlayer">
           <video id="teaserVideo" width="1280" height="720" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1" poster="static/images/paper/lewam_teaser_poster.png?v=47" aria-label="LeWAM animated teaser">
-            <source src="static/videos/paper/lewam_teaser_v52.mp4" type="video/mp4">
+            <source src="static/videos/paper/lewam_teaser_v53.mp4" type="video/mp4">
           </video>
           <input class="teaser-progress" id="teaserProgress" type="range" min="0" max="1000" step="1" value="0" aria-label="Teaser progress" disabled>
         </figure>
@@ -497,7 +497,7 @@
 
         <h3 class="subsection-title" id="dynamics-only">Isolating action-conditioned dynamics</h3>
         <div class="section-copy">
-          <p>We remove LeWAM's action prediction head at evaluation time and plan with CEM using only its learned latent dynamics. LeWAM achieves 84.0% success on Push-T and 86.0% on Cube, exceeding LeWM on Cube by 22.2 percentage points.</p>
+          <p>We remove LeWAM's action prediction head at evaluation time and plan with CEM using only its learned latent dynamics. LeWAM achieves 84.0% success on Push-T and 86.0% on Cube, exceeding LeWM on Cube by 22.2 percentage points. Together with the open-loop rollouts below, these results show that LeWAM learns action-conditioned dynamics that support planning.</p>
         </div>
         <div class="paper-table-wrap">
           <table class="paper-table">
@@ -541,8 +541,8 @@
             </div>
         </div>
         <div class="section-copy rollout-caption">
-          <p>Both models use the recorded actions from the LeWAM trajectory shown in the first column. We train post-hoc decoders on frozen LeWAM, map their latent states back to images as visualization.</p>
-          <p>Open-loop prediction rolls forward from the initial frames. Reconstruction encodes and decodes each observed frame. The goal frame is 25 steps ahead.</p>
+          <p>Both models receive the same recorded action sequence. Post-hoc decoders trained on frozen world models turn latent states into images for visualization.</p>
+          <p>Open-loop predictions advance from the initial observation context under the recorded actions. Reconstruction encodes and decodes each observed frame.</p>
         </div>
       </div>
     </section>
