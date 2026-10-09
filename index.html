@@ -277,6 +277,11 @@
       font-size: .82rem;
       line-height: 1.6;
     }
+    .site-footer { padding: 1.5rem 0 1.75rem; background: var(--surface); color: #68717a; font-size: .875rem; line-height: 1.65; text-align: center; }
+    .site-footer p { margin: 0; }
+    .site-footer a { text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
     @media (max-width: 760px) {
       .rollout-grid { grid-template-columns: 1fr; }
       .rollout-card { width: min(100%, 34rem); margin-inline: auto; }
@@ -691,6 +696,12 @@
     </section>
 
   </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>This website is adapted from the <a href="https://le-wm.github.io/" target="_blank" rel="noopener noreferrer">LeWorldModel project page</a>, with thanks to its authors.</p>
+    </div>
+  </footer>
 
   <script>
     (function () {
