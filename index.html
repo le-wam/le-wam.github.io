@@ -352,7 +352,7 @@
       <div class="container">
         <figure class="media-frame teaser-player" id="teaserPlayer">
           <video id="teaserVideo" width="1280" height="720" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1" poster="static/images/paper/lewam_teaser_poster.png?v=47" aria-label="LeWAM animated teaser">
-            <source src="static/videos/paper/lewam_teaser_v53.mp4" type="video/mp4">
+            <source src="static/videos/paper/lewam_teaser_v54.mp4" type="video/mp4">
           </video>
           <input class="teaser-progress" id="teaserProgress" type="range" min="0" max="1000" step="1" value="0" aria-label="Teaser progress" disabled>
         </figure>
@@ -461,7 +461,7 @@
         <h2 class="section-title">Understanding LeWAM's Dynamics, Representations, and Actions</h2>
         <h3 class="subsection-title">Latent representation probing</h3>
         <div class="section-copy">
-          <p>Linear probes measure object, proprioceptive, and action information in the learned representations. Across four tasks, LeWAM improves mean proprioception, action, and inverse-dynamics R² over LeWM by 0.21, 0.20, and 0.19.</p>
+          <p>Across four tasks, action learning improves mean proprioception, action, and inverse-dynamics R² over LeWM by 0.21, 0.20, and 0.19.</p>
         </div>
         <div class="paper-table-wrap">
           <table class="paper-table">
@@ -478,7 +478,7 @@
         </div>
         <p class="figure-caption">Action predicts the action chunk from the current latent state; parenthesized IDM scores use both current and future states.</p>
         <div class="section-copy">
-          <p><strong>Action prediction as an anti-collapse signal.</strong> Without SIGReg, both LeWAM action heads retain decodable state and action information on Push-T, while LeWM scores zero on every reported probe. Observed actions provide targets independent of the encoder.</p>
+          <p><strong>Action prediction as an anti-collapse signal.</strong> Observed actions provide targets independent of the encoder. Without SIGReg, LeWAM retains decodable information; LeWM's Push-T probe scores are zero.</p>
         </div>
         <figure class="figure">
           <div class="paper-reveal" id="ablationReveal">
@@ -490,14 +490,14 @@
           <figcaption class="figure-caption">(a) Planning gain from SIGReg. (b) Direct success and planning gain for visual encoders. (c) Planning gain for flow and MSE action heads. (d) Behavior-cloning success.</figcaption>
         </figure>
         <div class="section-copy">
-          <p><strong>The role of SIGReg.</strong> SIGReg also improves object-state decodability and planning. On Push-T, planning improves direct-control success by 14.7 percentage points with SIGReg, compared with 2.7 without it. Removing SIGReg lowers planning success by 25.3 points on Push-T, 4.0 on Scene, and 5.3 on Puzzle.</p>
-          <p><strong>Visual encoder.</strong> In the matched four-task comparison, training the encoder end-to-end gives 86.7% direct-control success, versus 79.0% with frozen DINOv2 CLS features and 75.8% with averaged patch features. Joint encoder training learns representations suited to control.</p>
-          <p><strong>Stochastic vs. MSE.</strong> Flow matching provides larger planning gains on the three tasks shown than Gaussian proposals around a deterministic MSE prediction. MSE learns a conditional mean; flow matching models the action distribution and can retain distinct modes of behavior. Without SIGReg, flow matching retains more object information than MSE (R²: 0.88 vs 0.66), with similar proprioception scores (0.85 vs 0.86). In the two-door navigation experiment, the flow head captures both routes.</p>
+          <p><strong>SIGReg.</strong> SIGReg improves object-state decodability and planning. Push-T planning gains 14.7 pp over direct control with SIGReg, versus 2.7 without it.</p>
+          <p><strong>Visual encoder.</strong> Across four matched tasks, joint training reaches 86.7% direct success, versus 79.0% with frozen DINOv2 CLS.</p>
+          <p><strong>Stochastic vs. MSE.</strong> MSE predicts a conditional mean; flow matching models multiple action modes and yields larger planning gains on all three tasks shown.</p>
         </div>
 
         <h3 class="subsection-title" id="dynamics-only">Isolating action-conditioned dynamics</h3>
         <div class="section-copy">
-          <p>We remove LeWAM's action prediction head at evaluation time and plan with CEM using only its learned latent dynamics. LeWAM achieves 84.0% success on Push-T and 86.0% on Cube, exceeding LeWM on Cube by 22.2 percentage points. Together with the open-loop rollouts below, these results show that LeWAM learns action-conditioned dynamics that support planning.</p>
+          <p>Remove LeWAM's action head and plan with CEM using its latent dynamics. Cube success exceeds LeWM by 22.2 pp.</p>
         </div>
         <div class="paper-table-wrap">
           <table class="paper-table">
@@ -541,8 +541,7 @@
             </div>
         </div>
         <div class="section-copy rollout-caption">
-          <p>Both models receive the same recorded action sequence. Post-hoc decoders trained on frozen world models turn latent states into images for visualization.</p>
-          <p>Open-loop predictions advance from the initial observation context under the recorded actions. Reconstruction encodes and decodes each observed frame.</p>
+          <p>Open-loop predictions use the same recorded actions for both models. Post-hoc decoders visualize frozen world models; reconstruction decodes each observed frame.</p>
         </div>
       </div>
     </section>
