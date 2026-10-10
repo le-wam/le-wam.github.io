@@ -70,6 +70,10 @@
     .publication-affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem .7rem; margin: .65rem 0 0; font-size: .9rem; }
     .publication-contribution { margin: .4rem 0 0; color: var(--muted); font-size: .82rem; }
     .publication-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: 1.1rem; }
+    .publication-updates { display: flex; justify-content: center; align-items: center; gap: .65rem; margin: .7rem 0 0; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+    .publication-twitter { display: inline-flex; align-items: center; gap: .3em; color: inherit; font-size: inherit; text-decoration: none; }
+    .publication-twitter:hover { color: var(--link); text-decoration: underline; }
+    .publication-twitter:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 2px; }
     .paper-button {
       display: inline-flex;
       align-items: center;
@@ -344,6 +348,11 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5m-9 5v10"/></svg><span>Data &amp; Checkpoints</span>
         </a>
       </div>
+      <p class="publication-updates">
+        <span>Arxiv coming soon.</span>
+        <span aria-hidden="true">·</span>
+        <a class="publication-twitter" href="https://x.com/Minghao__Fu/status/2108638867326968196" target="_blank" rel="noopener noreferrer" aria-label="LeWAM announcement on Twitter (opens in a new tab)"><span aria-hidden="true">🐦</span><span>Twitter</span></a>
+      </p>
     </div>
   </header>
 
